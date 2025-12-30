@@ -1,0 +1,145 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}My Cart{% endblock title %}
+
+{% block main-content %}
+<div class="container my-5">
+  <div class="row">
+
+    <!-- CART ITEMS -->
+    <div class="col-md-8">
+      <h3 class="mb-4">🛒 My Cart</h3>
+
+      {% if cart %}
+        {% for item in cart %}
+        <div class="card mb-3 shadow-sm">
+          <div class="card-body">
+            <div class="row align-items-center">
+
+              <div class="col-md-3 text-center">
+                <img src="{{ item.product.product_image.url }}"
+                     class="img-fluid rounded"
+                     height="120" width="120"
+                     alt="{{ item.product.title }}">
+              </div>
+
+              <div class="col-md-6">
+                <h5>{{ item.product.title }}</h5>
+                <p class="text-muted small">
+                  {{ item.product.description}}
+                </p>
+
+                <div class="d-flex align-items-center">
+                  <strong class="me-2">Qty:</strong>
+                  <a class="btn btn-sm btn-outline-secondary minus-cart"
+                     data-prod-id="{{ item.product.id }}">−</a>
+
+                  <span class="mx-3">{{ item.quantity }}</span>
+
+                  <a class="btn btn-sm btn-outline-secondary plus-cart"
+                     data-prod-id="{{ item.product.id }}">+</a>
+                </div>
+              </div>
+
+              <div class="col-md-3 text-end">
+                <p class="mb-1">
+                  ₹ {{ item.product.discounted_price }}
+                </p>
+                <p class="fw-bold">
+                  Total: ₹ {{ item.total_cost }}
+                </p>
+
+                <a href="{% url 'remove_cart_item' %}"
+                   class="btn btn-sm btn-outline-danger">
+                  Remove
+                </a>
+              </div>
+
+            </div>
+          </div>
+        </div>
+        {% endfor %}
+      {% else %}
+        <div class="alert alert-warning">
+          Your cart is empty.
+        </div>
+      {% endif %}
+    </div>
+
+    <!-- CART SUMMARY -->
+    <div class="col-md-4">
+      <div class="card shadow-sm">
+        <div class="card-body">
+          <h4>Order Summary</h4>
+          <hr>
+
+          <p class="d-flex justify-content-between">
+            Subtotal <span>₹ {{ amount }}</span>
+          </p>
+
+          <p class="d-flex justify-content-between">
+            Shipping <span>₹ 40</span>
+          </p>
+
+          <hr>
+
+          <p class="d-flex justify-content-between fw-bold">
+            Total <span>₹ {{ totalamount }}</span>
+          </p>
+
+          <div class="d-grid mt-3">
+            <a href="{% url 'confirm_address' %}"
+            class="btn btn-primary btn-lg w-100">
+            Proceed to Checkout
+            </a>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+</div>
+
+<script src="https://code.jquery.com/jquery-3.6.0.min.js"></script>
+
+<script>
+$(document).ready(function(){
+
+  // PLUS CART
+  $('.plus-cart').click(function(){
+    let prod_id = $(this).attr('data-prod-id');
+    let qtySpan = $(this).siblings('span');
+
+    $.ajax({
+      url: "{% url 'plus_cart' %}",
+      data: {
+        prod_id: prod_id
+      },
+      success: function(data){
+        qtySpan.text(data.quantity);
+        location.reload();  // simplest reliable way
+      }
+    });
+  });
+
+  // MINUS CART
+  $('.minus-cart').click(function(){
+    let prod_id = $(this).attr('data-prod-id');
+    let qtySpan = $(this).siblings('span');
+
+    $.ajax({
+      url: "{% url 'minus_cart' %}",
+      data: {
+        prod_id: prod_id
+      },
+      success: function(data){
+        qtySpan.text(data.quantity);
+        location.reload();
+      }
+    });
+  });
+
+});
+</script>
+
+{% endblock main-content %}

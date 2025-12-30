@@ -1,0 +1,54 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}Search{% endblock title %}
+
+{% block main-content %}
+<div class="container my-5">
+
+  <h4 class="mb-4">
+    Search Results for "<strong>{{ query }}</strong>"
+  </h4>
+
+  {% if products %}
+    <div class="row">
+
+      {% for product in products %}
+      <div class="col-md-3 mb-4">
+        <div class="card shadow-sm h-100">
+
+          <a href="{% url 'product-detail' product.id %}">
+            <img src="{{ product.product_image.url }}"
+                 class="card-img-top"
+                 style="height:200px; object-fit:cover;">
+          </a>
+
+          <div class="card-body text-center">
+            <h6 class="card-title">
+              {{ product.title }}
+            </h6>
+
+            <p class="fw-bold text-success mb-1">
+              ₹ {{ product.discounted_price }}
+            </p>
+
+            <a href="{% url 'product-detail' product.id %}"
+               class="btn btn-sm btn-primary">
+              View Product
+            </a>
+          </div>
+
+        </div>
+      </div>
+      {% endfor %}
+
+    </div>
+
+  {% else %}
+    <div class="alert alert-warning">
+      No products found for "<strong>{{ query }}</strong>"
+    </div>
+  {% endif %}
+
+</div>
+{% endblock main-content %}

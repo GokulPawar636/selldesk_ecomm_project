@@ -1,0 +1,85 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}Product Detail{% endblock title %}
+
+{% block main-content %}
+
+<div class="container my-5 product-detail-page">
+    <div class="row justify-content-between align-items-start">
+
+        <!-- Product Image -->
+        <div class="col-lg-5 text-center">
+            <img 
+                src="{{ product.product_image.url }}" 
+                alt="Product Image"
+                class="img-fluid rounded shadow"
+                style="max-height: 400px;"
+            >
+        </div>
+
+        <!-- Product Details -->
+        <div class="col-lg-6 productdetail">
+            <h1 class="mb-3" style="font-family: Georgia; font-size: 45px;">
+                {{ product.title }}
+            </h1>
+
+            <!-- Pricing -->
+            <div class="fs-4 mb-4" style="font-family: Rajdhani;">
+                <span class="text-danger fw-bold">
+                    ₹{{ product.discounted_price }}/-
+                </span>
+                &nbsp;
+                <small class="text-muted text-decoration-line-through">
+                    ₹{{ product.selling_price }}
+                </small>
+            </div>
+
+            <!-- Product Features -->
+            <h4 class="text-danger fw-bold mb-3">Product Features</h4>
+
+            <ul class="list-unstyled fs-5" style="font-family: Inter;">
+                <li class="bg-light rounded p-3 mb-2">
+                    <b>Description:</b> {{ product.description }}
+                </li>
+                <li class="bg-light rounded p-3 mb-2">
+                    <b>Composition:</b> {{ product.composition }}
+                </li>
+                <li class="bg-light rounded p-3 mb-2">
+                    <b>Product Application:</b> {{ product.prodapp }}
+                </li>
+            </ul>
+
+            <!-- Action Buttons -->
+            <div class="mt-4 d-flex gap-3" style="font-family: Rajdhani;">
+
+                <!-- Add to Cart -->
+                <form action="{% url 'add_to_cart' %}" method="GET">
+                    {% csrf_token %}
+                    <input type="hidden" name="prod_id" value="{{ product.id }}">
+                    <button type="submit" class="btn btn-primary btn-lg">
+                        Add to Cart
+                    </button>
+                    <a href="{% url 'add_to_wishlist' %}?prod_id={{ product.id }}"
+                        class="btn btn-outline-danger btn-lg ms-2">
+                        ❤️ Wishlist
+                        </a>
+                </form>
+                <!-- Buy Now -->
+           <form action="{% url 'buy_now' %}" method="GET">
+                <input type="hidden" name="prod_id" value="{{ product.id }}">
+                <button type="submit" class="btn btn-dark btn-lg">
+                    Buy Now
+                </button>
+            </form>
+
+            </div>
+        </div>
+
+    </div>
+</div>
+<br>
+<br>
+
+
+{% endblock main-content %}

@@ -1,0 +1,70 @@
+{% extends "app/base.html" %}
+{% block title %}Checkout{% endblock %}
+
+{% block main-content %}
+<div class="container my-5">
+  <h3 class="mb-4">🧾 Checkout</h3>
+
+  {% if cart %}
+    <div class="card shadow-sm">
+      <div class="card-body">
+
+        <!-- CART ITEMS -->
+        {% for item in cart %}
+          <div class="row align-items-center mb-3 border-bottom pb-2">
+
+            <div class="col-md-5">
+              <strong>{{ item.product.title }}</strong><br>
+              <small class="text-muted">
+                ₹{{ item.product.discounted_price }} × {{ item.quantity }}
+              </small>
+            </div>
+
+            <div class="col-md-3">
+              ₹ {{ item.total_cost }}
+            </div>
+
+            <div class="col-md-4 text-end">
+              <a href="{% url 'remove_cart_item' %}?prod_id={{ item.product.id }}"
+                 class="btn btn-sm btn-outline-danger">
+                ❌ Remove
+              </a>
+            </div>
+
+          </div>
+        {% endfor %}
+
+        <hr>
+
+        <!-- PRICE SUMMARY -->
+        <p class="d-flex justify-content-between">
+          Subtotal <span>₹ {{ amount }}</span>
+        </p>
+
+        <p class="d-flex justify-content-between">
+          Shipping <span>₹ {{ shipping_amount }}</span>
+        </p>
+
+        <hr>
+
+        <h5 class="d-flex justify-content-between">
+          Total <span class="text-danger">₹ {{ totalamount }}</span>
+        </h5>
+
+        <!-- NEXT STEP -->
+        <div class="text-end mt-4">
+          <a href="{% url 'confirm_address' %}"
+             class="btn btn-primary btn-lg">
+            Proceed to Address
+          </a>
+        </div>
+
+      </div>
+    </div>
+  {% else %}
+    <div class="alert alert-warning">
+      Your cart is empty. Add products to continue.
+    </div>
+  {% endif %}
+</div>
+{% endblock %}

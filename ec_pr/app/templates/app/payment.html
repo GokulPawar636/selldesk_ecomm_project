@@ -1,0 +1,71 @@
+{% extends "app/base.html" %}
+{% block title %}Secure Payment{% endblock %}
+
+{% block main-content %}
+<div class="container my-5">
+  <div class="row justify-content-center">
+    <div class="col-md-7">
+
+      <div class="card shadow-sm">
+        <div class="card-header bg-light">
+          <h5 class="mb-0">🔐 Secure Payment</h5>
+        </div>
+
+        <div class="card-body">
+
+          <!-- ORDER SUMMARY -->
+          <h6 class="mb-3">Order Summary</h6>
+
+          {% for item in cart %}
+            <p class="d-flex justify-content-between">
+              {{ item.product.title }} × {{ item.quantity }}
+              <span>₹ {{ item.total_cost }}</span>
+            </p>
+          {% endfor %}
+
+          <hr>
+
+          <p class="d-flex justify-content-between">
+            Shipping <span>₹ 40</span>
+          </p>
+
+          <h5 class="d-flex justify-content-between">
+            Total <span class="text-success">₹ {{ totalamount }}</span>
+          </h5>
+
+          <hr>
+
+          <!-- PAYMENT METHOD -->
+          <h6 class="mt-4">Payment Method</h6>
+
+          <div class="form-check">
+            <input class="form-check-input" type="radio" checked>
+            <label class="form-check-label">
+              💳 Card / UPI / Netbanking (Demo)
+            </label>
+          </div>
+
+          <div class="alert alert-info mt-3 small">
+            This is a demo payment. No real money will be charged.
+          </div>
+
+          <div class="d-grid mt-4">
+            <form method="post" action="{% url 'place_order' %}">
+              {% csrf_token %}
+
+              <button type="submit" class="btn btn-success btn-lg w-100">
+                Confirm & Pay
+              </button>
+            </form>
+
+
+          </div>
+
+        </div>
+      </div>
+
+    </div>
+  </div>
+</div>
+{% endblock %}
+ 

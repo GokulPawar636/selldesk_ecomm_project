@@ -1,0 +1,251 @@
+{% extends "app/base.html" %}
+{% load static %}
+
+{% block title %}My Account{% endblock title %}
+
+{% block main-content %}
+<div class="container my-5">
+  <div class="row">
+
+    <!-- ================= SIDEBAR ================= -->
+    <div class="col-md-3 mb-4">
+      <div class="card shadow-sm">
+        <div class="card-body text-center">
+
+          {% if request.user.customer.profile_image %}
+            <img src="{{ request.user.customer.profile_image.url }}"
+                 class="rounded-circle mb-3"
+                 width="90" height="90"
+                 style="object-fit:cover;">
+          {% else %}
+            <img src="{% static 'app/images/user.png' %}"
+                 class="rounded-circle mb-3"
+                 width="90" height="90">
+          {% endif %}
+
+          <h5 class="mb-0 text-capitalize">{{ request.user.username }}</h5>
+          <small class="text-muted">{{ request.user.email }}</small>
+        </div>
+
+        <div class="list-group list-group-flush">
+          <a href="#" class="list-group-item list-group-item-action active"
+             onclick="showSection('profile', this)">👤 My Profile</a>
+
+          <a href="#" class="list-group-item list-group-item-action"
+             onclick="showSection('address', this)">📍 Address</a>
+
+          <a href="#" class="list-group-item list-group-item-action"
+             onclick="showSection('orders', this)">📦 My Orders</a>
+
+          <a href="#" class="list-group-item list-group-item-action"
+             onclick="showSection('wishlist', this)">❤️ Wishlist</a>
+
+          <a href="#" class="list-group-item list-group-item-action"
+             onclick="showSection('cart', this)">🛒 Cart</a>
+
+          <a href="{% url 'password_change' %}"
+             class="list-group-item list-group-item-action">
+            🔒 Change Password
+          </a>
+
+          <form method="post" action="{% url 'logout' %}">
+            {% csrf_token %}
+            <button type="submit"
+              class="list-group-item list-group-item-action text-danger border-0 text-start">
+              🚪 Logout
+            </button>
+          </form>
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= CONTENT ================= -->
+    <div class="col-md-9">
+
+      <!-- ================= PROFILE ================= -->
+      <div id="profile" class="account-section">
+        <form method="post" enctype="multipart/form-data">
+          {% csrf_token %}
+
+          <div class="card shadow-sm mb-4">
+            <div class="card-header bg-light">
+              <h5 class="mb-0">👤 Personal Information</h5>
+            </div>
+
+            <div class="card-body">
+              <div class="row">
+
+                {% for fm in user_form %}
+                <div class="col-md-6 mb-3">
+                  {{ fm.label_tag }}
+                  {{ fm }}
+                  <small class="text-danger">{{ fm.errors|striptags }}</small>
+                </div>
+                {% endfor %}
+
+                <!-- Profile Image Upload -->
+                <div class="col-md-6 mb-3">
+                  <label class="form-label">Profile Image</label>
+                  {{ profile_form.profile_image }}
+                  <small class="text-muted">JPG / PNG only</small>
+                </div>
+
+              </div>
+            </div>
+          </div>
+
+          <button type="submit" name="submit_profile"
+                  class="btn btn-primary px-4">
+            💾 Save Profile
+          </button>
+        </form>
+      </div>
+
+      <!-- ================= ADDRESS ================= -->
+      <div id="address" class="account-section d-none">
+        <form method="post">
+          {% csrf_token %}
+
+          <div class="card shadow-sm">
+            <div class="card-header bg-light">
+              <h5 class="mb-0">📍 Address</h5>
+            </div>
+
+            <div class="card-body">
+              <div class="row">
+                {% for fm in profile_form %}
+                {% if fm.name != 'profile_image' %}
+                <div class="col-md-6 mb-3">
+                  {{ fm.label_tag }}
+                  {{ fm }}
+                  <small class="text-danger">{{ fm.errors|striptags }}</small>
+                </div>
+                {% endif %}
+                {% endfor %}
+              </div>
+
+              <button type="submit" name="submit_address"
+                      class="btn btn-success mt-2">
+                💾 Save Address
+              </button>
+            </div>
+          </div>
+        </form>
+      </div>
+
+      <!-- ================= ORDERS ================= -->
+      <div id="orders" class="account-section d-none">
+        <h4 class="mb-4">📦 My Orders</h4>
+
+        {% if orders %}
+          <div class="accordion" id="orderAccordion">
+            {% for order in orders %}
+            <div class="accordion-item mb-3 shadow-sm">
+              <h2 class="accordion-header">
+                <button class="accordion-button collapsed"
+                        data-bs-toggle="collapse"
+                        data-bs-target="#order{{ order.id }}">
+                  <strong>Order #{{ order.id }}</strong>
+                  <span class="ms-auto badge bg-success">
+                    ₹ {{ order.amount }}
+                  </span>
+                </button>
+              </h2>
+
+              <div id="order{{ order.id }}" class="accordion-collapse collapse">
+                <div class="accordion-body">
+
+                  <h6>🛒 Items</h6>
+                  <ul class="list-group mb-3">
+                    {% for item in order.items.all %}
+                      <li class="list-group-item d-flex justify-content-between">
+                        {{ item.product.title }} × {{ item.quantity }}
+                        <span>₹ {{ item.price }}</span>
+                      </li>
+                    {% endfor %}
+                  </ul>
+
+                  <h6>📍 Address</h6>
+                  <p class="small text-muted">
+                    {{ order.address.locality }},
+                    {{ order.address.city }},
+                    {{ order.address.state }} - {{ order.address.zipcode }}
+                  </p>
+
+                  <span class="badge bg-info">
+                    {{ order.get_status_display }}
+                  </span>
+
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="alert alert-warning">
+            You haven’t placed any orders yet.
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- ================= WISHLIST ================= -->
+      <div id="wishlist" class="account-section d-none">
+        <h4 class="mb-4">❤️ Wishlist</h4>
+
+        {% if wishlist %}
+          <div class="row">
+            {% for item in wishlist %}
+            <div class="col-md-4 mb-4">
+              <div class="card shadow-sm h-100">
+                <img src="{{ item.product.product_image.url }}"
+                     class="card-img-top"
+                     style="height:180px; object-fit:cover">
+                <div class="card-body">
+                  <h6>{{ item.product.title }}</h6>
+                  <p class="fw-bold text-success">
+                    ₹ {{ item.product.discounted_price }}
+                  </p>
+                </div>
+              </div>
+            </div>
+            {% endfor %}
+          </div>
+        {% else %}
+          <div class="alert alert-warning">
+            Wishlist is empty ❤️
+          </div>
+        {% endif %}
+      </div>
+
+      <!-- ================= CART ================= -->
+      <div id="cart" class="account-section d-none">
+        <a href="{% url 'show_cart' %}" class="btn btn-primary">
+          View Cart
+        </a>
+      </div>
+
+      <!-- ================= MESSAGES ================= -->
+      {% for message in messages %}
+        <div class="alert alert-{{ message.tags }} mt-3">
+          {{ message }}
+        </div>
+      {% endfor %}
+
+    </div>
+  </div>
+</div>
+
+<script>
+function showSection(sectionId, el) {
+  document.querySelectorAll('.account-section')
+    .forEach(sec => sec.classList.add('d-none'));
+
+  document.getElementById(sectionId).classList.remove('d-none');
+
+  document.querySelectorAll('.list-group-item')
+    .forEach(link => link.classList.remove('active'));
+
+  el.classList.add('active');
+}
+</script>
+{% endblock main-content %}

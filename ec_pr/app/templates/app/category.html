@@ -1,0 +1,111 @@
+{% extends "app/base.html" %}
+{% load static %}
+{% block title %}Category{% endblock title %}
+
+{% block main-content %}
+<div class="container my-5">
+
+  <div class="row">
+
+    <!-- ================= LEFT SIDEBAR ================= -->
+    <div class="col-md-3 mb-4">
+      <div class="card shadow-sm">
+
+        <div class="card-header fw-bold bg-light">
+          Filter by Type
+        </div>
+
+        <div class="list-group list-group-flush">
+
+          <!-- ALL -->
+          <a href="{% url 'category' active_category %}"
+             class="list-group-item list-group-item-action
+             {% if not request.GET.subcategory %}active{% endif %}">
+            All Products
+          </a>
+
+          <!-- SUBCATEGORIES -->
+          {% for sub in subcategories %}
+            {% if sub %}
+              <a href="?subcategory={{ sub }}"
+                 class="list-group-item list-group-item-action
+                 {% if request.GET.subcategory == sub %}active{% endif %}">
+                {{ sub }}
+              </a>
+            {% endif %}
+          {% empty %}
+            <span class="list-group-item text-muted small">
+              No subcategories available
+            </span>
+          {% endfor %}
+
+        </div>
+      </div>
+    </div>
+
+    <!-- ================= PRODUCTS GRID ================= -->
+    <div class="col-md-9">
+
+      {% if product %}
+      <div class="row g-4">
+
+        {% for prod in product %}
+        <div class="col-lg-4 col-md-6 col-sm-6">
+
+          <div class="card h-100 shadow-sm product-card border-0">
+
+            <!-- PRODUCT IMAGE -->
+            <a href="{% url 'product-detail' prod.id %}">
+              <img src="{{ prod.product_image.url }}"
+                   class="card-img-top p-3"
+                   alt="{{ prod.title }}"
+                   style="
+                     height: 220px;
+                     object-fit: contain;
+                     background: #f8f9fa;
+                   ">
+            </a>
+
+            <!-- PRODUCT BODY -->
+            <div class="card-body text-center d-flex flex-column px-3 pb-3">
+
+              <!-- TITLE -->
+              <h6 class="fw-semibold mb-2 text-truncate">
+                {{ prod.title }}
+              </h6>
+
+              <!-- PRICE -->
+              <div class="mb-3">
+                <span class="text-danger fw-bold fs-6">
+                  ₹{{ prod.discounted_price }}
+                </span>
+                <small class="text-muted text-decoration-line-through ms-1">
+                  ₹{{ prod.selling_price }}
+                </small>
+              </div>
+
+              <!-- BUTTON -->
+              <a href="{% url 'product-detail' prod.id %}"
+                 class="btn btn-sm btn-outline-primary mt-auto w-100">
+                View Details
+              </a>
+
+            </div>
+          </div>
+
+        </div>
+        {% endfor %}
+
+      </div>
+
+      {% else %}
+      <div class="alert alert-warning text-center">
+        No products available in this category.
+      </div>
+      {% endif %}
+
+    </div>
+
+  </div>
+</div>
+{% endblock main-content %}
